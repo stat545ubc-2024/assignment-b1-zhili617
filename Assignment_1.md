@@ -177,7 +177,7 @@ Test_Function <-  test_that("Testing multiplication function", {
 })
 ```
 
-    ## Test passed 😀
+    ## Test passed 🥳
 
 In this part, I create a new simple data frame named Sim_data with clear
 and easily calculable numeric values. I computed the mean, minimum,
