@@ -22,7 +22,7 @@ library(testthat)
 ```
 
     ## 
-    ## 载入程序包：'testthat'
+    ## Attaching package: 'testthat'
     ## 
     ## The following object is masked from 'package:dplyr':
     ## 
@@ -150,7 +150,7 @@ target_error <-  summarize_target(
 )
 ```
 
-    ## Error in summarize_target(data = steam_games, group_vars = "types", target_var = "languages", : 参数没有用(error = TRUE)
+    ## Error in summarize_target(data = steam_games, group_vars = "types", target_var = "languages", : unused argument (error = TRUE)
 
 The function will stop and display an error message indicating that the
 target variable is not a numeric variable.
