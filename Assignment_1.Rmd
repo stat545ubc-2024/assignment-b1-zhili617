@@ -1,0 +1,145 @@
+---
+title: "Assignment 1"
+output: github_document
+---
+```{r}
+library(datateachr)
+library(tidyverse)
+library(testthat)
+```
+
+# Exercise 1&2 - Create a Function and Write a Document for this Function:
+```{r}
+
+#' Summarize a Target Numeric Variable in a Data Frame by Specified Grouping Variables
+#' 
+#' This function calculates summary statistics for a specific numeric column in a data frame. It computes the 
+#' mean, minimum, maximum, and standard deviation for each group defined by the specified grouping variables.
+#' 
+#' 
+#' @param data A data frame containing the data to be summarized.
+#' Named 'data' to indicate this part of function expects a data frame as input.
+#' @param group_vars A character vector specifying the names of the columns to group by.
+#' Named 'group_vars' to indicate these variables determine the grouping structure
+#' @param target_var A single character string specifying the name of the numeric column to summarize.
+#' Named 'target_var' to indicate this is the target variable need to be summarized.
+#' @return A data frame containing the grouped summary statistics, including mean, minimum, maximum, and   
+#' standard deviation of the target variable for each combination of grouping variables.
+
+
+
+
+summarize_target <- function(data, group_vars, target_var){
+  if (!is.data.frame(data)){
+    stop("Sorry, your ",data," should be data frame.")
+  }
+  
+  if (length(setdiff(group_vars, names(data))) != 0){
+    stop("Sorry, all ",group_vars," should be column inside of your 'data'.")
+  }
+  
+  if (!is.character(group_vars)){
+    stop("Sorry, your ",group_vars," should be a character vector.")
+  }
+  
+  if (!(target_var %in% names(data))) {
+    stop(paste("Sorry, your ",target_var," does not exist in your 'data'."))
+  }
+  
+  if (!is.character(target_var)|| length(target_var) != 1){
+    stop("Sorry, your ",target_var," should be a single character vector.")
+  }
+  
+  
+  if (!is.numeric(data[[target_var]])) {
+    stop("Sorry, the elements inside of your ",target_var," should be numeric.")
+  }
+  
+  summarize_info <- data %>%
+    group_by(across(all_of(group_vars))) %>%
+    summarize(
+      mean = mean(.data[[target_var]], na.rm = TRUE),
+      min = min(.data[[target_var]], na.rm = TRUE),
+      max = max(.data[[target_var]], na.rm = TRUE),
+      sd = sd(.data[[target_var]], na.rm = TRUE)
+    )
+  
+  return (summarize_info)
+}
+
+
+
+```
+
+
+# Exercise 3 - Usage of Your Function
+
+## Example 1:
+```{r}
+discount_types <-  summarize_target(
+  data = steam_games,
+  group_vars = "types",
+  target_var = "discount_price"
+)
+
+print(discount_types)
+```
+
+We use the steam_games data here to compute summary statistics for the discount_price variable group by types.
+
+## Example 2:
+```{r, error = TRUE}
+group_error <-  summarize_target(
+  data = steam_games,
+  group_vars = "color",
+  target_var = "discount_price"
+)
+```
+The function will stop and display an error message indicating that the specified grouping variable does not exist in the data frame.
+
+## Example 3:
+```{r, error = TRUE}
+target_error <-  summarize_target(
+  data = steam_games,
+  group_vars = "types",
+  target_var = "languages", error = TRUE
+)
+
+```
+
+The function will stop and display an error message indicating that the target variable is not a numeric variable.
+
+
+# Exercise 4 - Test the Function
+```{r}
+# Define a simple data frame
+
+Sim_data <- data.frame(
+    type = c("A", "A", "B", "B"),
+    value = c(10, 20, 30, 40),
+    color = c("Blue", "red", "red", NA),
+    count = c(5, 2, "NA", 4)
+  )
+
+ expected_summary <- tibble( type = c("A", "B"), mean = c(15, 35), min = c(10, 30), max = c(20, 40), sd = c(7.0710678, 7.0710678))
+
+Test_Function <-  test_that("Testing multiplication function", {
+  expect_equal(summarize_target(Sim_data, "type", "value"), expected_summary)
+  expect_length(summarize_target(Sim_data, "color", "value"), 5)
+  expect_error(summarize_target(Sim_data, "type", "color"), "Sorry, the elements inside of your color should be numeric.")
+  expect_error(summarize_target(Sim_data, "type", "number"), "Sorry, your  number  does not exist in your 'data'.")
+})
+```
+In this part, I create a new simple data frame named Sim_data with clear and easily calculable numeric values. I computed the mean, minimum, maximum, and standard deviation by hand for each group to establish expected summary statistics. Also, I created a series of formal tests to verify the functionality of the summarize_target() function. These tests check whether the function:
+
+1. Accurately computes summary statistics, when the target_var without missing values.
+2. Maintains the correct structure of the output even when the grouping variable contains NA values.
+3. Correctly identifies and reports errors when target_var is not a numeric vector.
+4. Correctly identifies and reports errors when a specified summary variable does not exist in the data frame.
+
+
+
+
+
+
+
